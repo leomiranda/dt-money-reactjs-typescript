@@ -1,4 +1,4 @@
-import { GlobalStyle } from './assets/styles/global';
+import { GlobalStyle } from './styles/global';
 import { Dashboard } from './components/Dashboard';
 import { Header } from './components/Header';
 import Modal from 'react-modal';
