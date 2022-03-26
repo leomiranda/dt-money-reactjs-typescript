@@ -1,10 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../../services/api';
 import { Container } from './styled';
 
+interface ITransaction {
+	id: number;
+	title: string;
+	type: string;
+	category: string;
+	amount: number;
+	createAt: string;
+}
+
 export function TransactionsTable() {
+	const [transactions, setTransactions] = useState<ITransaction[]>([]);
+
 	useEffect(() => {
-		api.get('transactions').then((response) => console.log(response.data));
+		api
+			.get<{ transactions: ITransaction[] }>('transactions')
+			.then((response) => setTransactions(response.data.transactions));
+
+		console.log('>>> transactions', transactions);
 	}, []);
 
 	return (
@@ -19,30 +34,24 @@ export function TransactionsTable() {
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td>Desenvolvimento de site</td>
-						<td className='deposit'>R$ 10.000,00</td>
-						<td>Desenvolvimento</td>
-						<td>20/12/21</td>
-					</tr>
-					<tr>
-						<td>Aluguel</td>
-						<td className='withdraw'>- R$ 1.100,00</td>
-						<td>Casa</td>
-						<td>17/12/21</td>
-					</tr>
-					<tr>
-						<td>Desenvolvimento de site</td>
-						<td className='deposit'>R$ 8.000,00</td>
-						<td>Desenvolvimento</td>
-						<td>14/12/21</td>
-					</tr>
-					<tr>
-						<td>Desenvolvimento de site</td>
-						<td className='deposit'>R$ 15.000,00</td>
-						<td>Desenvolvimento</td>
-						<td>10/12/21</td>
-					</tr>
+					{transactions.length > 0 &&
+						transactions.map((transaction) => (
+							<tr key={transaction.id}>
+								<td>{transaction.title}</td>
+								<td className="deposit">
+									{new Intl.NumberFormat('pt-br', {
+										style: 'currency',
+										currency: 'BRL',
+									}).format(transaction.amount)}
+								</td>
+								<td>{transaction.category}</td>
+								<td>
+									{new Intl.DateTimeFormat('pt-br').format(
+										new Date(transaction.createAt)
+									)}
+								</td>
+							</tr>
+						))}
 				</tbody>
 			</table>
 		</Container>
